@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stardew MAS Simulator</title>
+    <!-- Pixel Font -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css?v=2">
+</head>
+
+<body>
+    <div id="left-panel" class="pixel-panel">
+        <div id="chat-toggle" onclick="toggleChat()">
+            <span id="toggle-icon">▲</span>&nbsp;<span id="toggle-text">Company Broadcast</span>
+            <div id="chat-badge">New</div>
+        </div>
+        <div class="chat-header" id="chat-header" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span>📢 Company Broadcast</span><div class="status-dot"></div>
+                </div>
+                <button onclick="event.stopPropagation(); showAppManager()" style="background:#4ade80; color:#000; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">🌐 Active Apps</button>
+            </div>
+            <div id="project-selector-wrapper" style="position:relative; width:100%;">
+                <input type="hidden" id="project-selector" value="">
+            </div>
+        </div>
+        <div id="chat-log"></div>
+        <div id="chat-input-area" style="display:flex; flex-direction:column; gap:8px; padding:12px; padding-top:0;">
+            <div style="display:flex; flex-direction:row; width:100%; gap:8px; align-items: stretch; position: relative;">
+                <textarea id="chat-input" placeholder="Enter requirements... (Shift+Enter for new line)" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendBroadcast(); }" style="flex-grow:1; min-width:0; padding: 12px; padding-right: 40px; border-radius: 8px; border: 2px solid #8c5a35; resize: none; height: 50px; font-family: inherit; font-size: 16px; line-height: 1.5; transition: height 0.2s ease-in-out;"></textarea>
+                <div id="expand-btn" onclick="toggleInputSize()" style="position: absolute; right: 100px; bottom: 12px; font-size: 18px; cursor: pointer; color: #8c5a35; opacity: 0.7; transition: opacity 0.2s;">📐</div>
+                <button onclick="sendBroadcast()" style="padding: 0 20px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; align-self: flex-end; height: 50px; font-size: 16px; font-weight: bold;">Send</button>
+            </div>
+            <div style="display:flex; flex-direction:row; width:100%; gap:8px; justify-content: flex-end;">
+                <button id="clearBtn" onclick="clearLogs()" style="padding: 6px 12px; background: #e74c3c; color: white; border: 2px solid #c0392b; border-radius: 6px; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-size: 12px; font-family: sans-serif; box-shadow: none;">🗑️ Clear Records</button>
+                <button id="killBtn" onclick="killAllAgents()" style="padding: 6px 12px; background: #c0392b; color: white; border: 2px solid #922b21; border-radius: 6px; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-size: 12px; font-family: sans-serif; box-shadow: none;">🛑 Emergency Stop</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewport">
+        <div id="zoom-controls">
+            <div class="zoom-btn" onclick="manualZoom(0.1)">+</div>
+            <div class="zoom-btn" onclick="manualZoom(-0.1)">-</div>
+        </div>
+
+        <div id="world">
+            <!-- Walls -->
+            <div id="top-wall">
+                <div class="window" style="left: 150px;"></div>
+                <div class="window" style="left: 550px;"></div>
+                <div class="window" style="left: 950px;"></div>
+            </div>
+
+            <!-- Rugs (Zones) -->
+            <div id="rug-meet" class="rug"><div class="rug-label">MEET</div></div>
+            <div id="rug-dev" class="rug"><div class="rug-label">DEV</div></div>
+            <div id="rug-qa" class="rug"><div class="rug-label">QA</div></div>
+            <div id="rug-research" class="rug"><div class="rug-label">DATA</div></div>
+
+            <!-- Decor -->
+            <div class="decor" style="top:50px; left:50px;">🪴</div>
+            <div class="decor" style="top:50px; left:1100px;">🪴</div>
+            <div class="decor" style="top:50px; left:300px;">🗄️</div>
+            <div class="decor" style="top:50px; left:800px;">📚</div>
+            <div class="decor" style="top:300px; left:850px; font-size:32px;">☕</div>
+
+            <div class="meet-table" style="top: 220px; left: 500px;">📄 ☕ 📄</div>
+            
+            <!-- Desks & Computers -->
+            <div class="desk-pixel" style="top: 250px; left: 100px;"><div class="computer">🖥️</div></div> <!-- CEO -->
+            <div class="desk-pixel" style="top: 350px; left: 100px;"><div class="computer">🖥️</div></div> <!-- CPO -->
+            <div class="desk-pixel" style="top: 250px; left: 1000px;"><div class="computer">🖥️</div></div> <!-- CTO -->
+            <div class="desk-pixel" style="top: 650px; left: 150px;"><div class="computer">🖥️</div></div> <!-- Programmer -->
+            <div class="desk-pixel" style="top: 650px; left: 550px;"><div class="computer">🖥️</div></div> <!-- Tester -->
+            <div class="desk-pixel" style="top: 650px; left: 750px;"><div class="computer">🖥️</div></div> <!-- Reviewer -->
+            <div class="desk-pixel" style="top: 550px; left: 1000px;"><div class="computer">🖥️</div></div> <!-- Analyst -->
+            <div class="desk-pixel" style="top: 680px; left: 1000px;"><div class="computer">🖥️</div></div> <!-- Researcher -->
+
+            <div id="sandbox-container"></div>
+        </div>
+        
+        <!-- Inventory Wrapper (Scrollable, Top Center) -->
+        <div id="inventory-wrapper" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 800px; z-index: 100; display: flex; flex-direction: column; align-items: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            <div id="inventory-bar" style="display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap; justify-content: center; background: rgba(20, 20, 22, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.4); overflow: hidden; max-height: 48px; width: 100%; box-sizing: border-box; transition: max-height 0.3s ease-in-out;"></div>
+            <button id="inventory-expand-btn" onclick="toggleInventory()" style="margin-top: -2px; padding: 4px 32px; background: rgba(30, 30, 34, 0.9); border: 1px solid rgba(255,255,255,0.1); border-top: none; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; color: #888; font-size: 10px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">▼</button>
+        </div>
+            <div id="project-selector-wrapper" style="position:relative; width:100%;">
+                <input type="hidden" id="project-selector" value="">
+            </div>
+        </div>
+        <div id="chat-log"></div>
+        <div id="chat-input-area" style="display:flex; flex-direction:column; gap:8px; padding:12px; padding-top:0;">
+            <div style="display:flex; flex-direction:row; width:100%; gap:8px; align-items: stretch; position: relative;">
+                <textarea id="chat-input" placeholder="Enter requirements... (Shift+Enter for new line)" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendBroadcast(); }" style="flex-grow:1; min-width:0; padding: 12px; padding-right: 40px; border-radius: 8px; border: 2px solid #8c5a35; resize: none; height: 50px; font-family: inherit; font-size: 16px; line-height: 1.5; transition: height 0.2s ease-in-out;"></textarea>
+                <div id="expand-btn" onclick="toggleInputSize()" style="position: absolute; right: 100px; bottom: 12px; font-size: 18px; cursor: pointer; color: #8c5a35; opacity: 0.7; transition: opacity 0.2s;">📐</div>
+                <button onclick="sendBroadcast()" style="padding: 0 20px; border-radius: 8px; white-space: nowrap; flex-shrink: 0; align-self: flex-end; height: 50px; font-size: 16px; font-weight: bold;">Send</button>
+            </div>
+            <div style="display:flex; flex-direction:row; width:100%; gap:8px; justify-content: flex-end;">
+                <button id="clearBtn" onclick="clearLogs()" style="padding: 6px 12px; background: #e74c3c; color: white; border: 2px solid #c0392b; border-radius: 6px; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-size: 12px; font-family: sans-serif; box-shadow: none;">🗑️ Clear Records</button>
+                <button id="killBtn" onclick="killAllAgents()" style="padding: 6px 12px; background: #c0392b; color: white; border: 2px solid #922b21; border-radius: 6px; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0; font-size: 12px; font-family: sans-serif; box-shadow: none;">🛑 Emergency Stop</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewport">
+        <div id="zoom-controls">
+            <div class="zoom-btn" onclick="manualZoom(0.1)">+</div>
+            <div class="zoom-btn" onclick="manualZoom(-0.1)">-</div>
+        </div>
+
+        <div id="world">
+            <!-- Walls -->
+            <div id="top-wall">
+                <div class="window" style="left: 150px;"></div>
+                <div class="window" style="left: 550px;"></div>
+                <div class="window" style="left: 950px;"></div>
+            </div>
+
+            <!-- Rugs (Zones) -->
+            <div id="rug-meet" class="rug"><div class="rug-label">MEET</div></div>
+            <div id="rug-dev" class="rug"><div class="rug-label">DEV</div></div>
+            <div id="rug-qa" class="rug"><div class="rug-label">QA</div></div>
+            <div id="rug-research" class="rug"><div class="rug-label">DATA</div></div>
+
+            <!-- Decor -->
+            <div class="decor" style="top:50px; left:50px;">🪴</div>
+            <div class="decor" style="top:50px; left:1100px;">🪴</div>
+            <div class="decor" style="top:50px; left:300px;">🗄️</div>
+            <div class="decor" style="top:50px; left:800px;">📚</div>
+            <div class="decor" style="top:300px; left:850px; font-size:32px;">☕</div>
+
+            <div class="meet-table" style="top: 220px; left: 500px;">📄 ☕ 📄</div>
+            
+            <!-- Desks & Computers -->
+            <div class="desk-pixel" style="top: 250px; left: 100px;"><div class="computer">🖥️</div></div> <!-- CEO -->
+            <div class="desk-pixel" style="top: 350px; left: 100px;"><div class="computer">🖥️</div></div> <!-- CPO -->
+            <div class="desk-pixel" style="top: 250px; left: 1000px;"><div class="computer">🖥️</div></div> <!-- CTO -->
+            <div class="desk-pixel" style="top: 650px; left: 150px;"><div class="computer">🖥️</div></div> <!-- Programmer -->
+            <div class="desk-pixel" style="top: 650px; left: 550px;"><div class="computer">🖥️</div></div> <!-- Tester -->
+            <div class="desk-pixel" style="top: 650px; left: 750px;"><div class="computer">🖥️</div></div> <!-- Reviewer -->
+            <div class="desk-pixel" style="top: 550px; left: 1000px;"><div class="computer">🖥️</div></div> <!-- Analyst -->
+            <div class="desk-pixel" style="top: 680px; left: 1000px;"><div class="computer">🖥️</div></div> <!-- Researcher -->
+
+            <div id="sandbox-container"></div>
+        </div>
+        
+            <button id="inventory-expand-btn" onclick="toggleInventory()">▼</button>
+        </div>
+    </div>
+    
+    <div id="right-panel" class="pixel-panel">
+        <div style="padding:15px; background:#8b5a2b; color:#fff; font-weight:bold; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #5a3a1b; flex-shrink:0;">
+            <span>📁 Project Files</span>
+            <button onclick="loadFileTree()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Refresh">🔄</button>
+        </div>
+        <div style="padding:8px; background:#1e1e1e; border-bottom:1px solid #333; flex-shrink:0;">
+            <input type="text" id="file-search-input" placeholder="Search files..." oninput="filterFileTree()" style="width:100%; padding:6px 8px; background:rgba(0,0,0,0.5); border:1px solid #444; color:#fff; border-radius:4px; font-family:monospace; font-size:13px; outline:none;" autocomplete="off">
+        </div>
+        <div id="file-tree-content" style="flex-grow:1; overflow-y:auto; padding:10px;">
+            <div style="color:#888; text-align:center; padding-top:20px;">Select a project to view files</div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="login-modal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:9999; flex-direction:column; font-family:monospace;">
+        <h1 style="color:#4ade80; font-size:48px; margin-bottom:20px; text-shadow:2px 2px 0px #000;">Terminal Access</h1>
+        <div style="background:#222; border:4px solid #4ade80; padding:30px; border-radius:8px; display:flex; flex-direction:column; gap:15px; width:400px; box-shadow:0 0 20px rgba(74,222,128,0.3);">
+            <input type="text" id="login-user" placeholder="Username" style="padding:10px; background:#000; border:2px solid #4ade80; color:#4ade80; font-size:16px; outline:none;" />
+            <input type="password" id="login-pass" placeholder="Password" onkeydown="if(event.key==='Enter') doLogin()" style="padding:10px; background:#000; border:2px solid #4ade80; color:#4ade80; font-size:16px; outline:none;" />
+            <button id="login-btn" onclick="doLogin()" style="padding:12px; background:#4ade80; color:#000; border:none; font-weight:bold; cursor:pointer; font-size:18px;">LOGIN</button>
+            <div id="login-error" style="color:#ef4444; font-weight:bold; text-align:center; min-height:20px;"></div>
+        </div>
+    </div>
+
+    <div id="custom-dialog-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none;">
+        <div id="custom-dialog-box" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:600px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column; background:rgba(20,20,20,0.98); border:4px solid #d4a373; color:#fff; font-family:monospace; box-shadow: 0 10px 40px rgba(0,0,0,0.9); border-radius: 8px;">
+            <div id="custom-dialog-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #d4a373; padding:15px 20px; background:rgba(0,0,0,0.3); flex-shrink:0; cursor:move;">
+                <div style="display:flex; align-items:center; gap:15px; flex-grow: 1;">
+                    <span id="custom-dialog-title" style="margin:0; color:#d4a373; font-size:18px; pointer-events:none;">Notice</span>
+                </div>
+                <button onclick="closeCustomDialog(false)" style="background:transparent; color:#fff; border:none; font-size:24px; cursor:pointer; line-height:1; margin-left: 10px;">×</button>
+            </div>
+            <div id="custom-dialog-message" style="padding:20px; overflow-y:auto; flex-grow:1; line-height: 1.6; word-wrap: break-word; white-space: pre-wrap; font-size: 14px; background:rgba(10,10,10,0.5);"></div>
+            <div id="custom-dialog-input-container" style="display:none; padding:0 20px 20px 20px; background:rgba(10,10,10,0.5);">
+                <input type="text" id="custom-dialog-input" style="width:100%; padding:10px; background:rgba(0,0,0,0.6); border:2px solid #555; color:#fff; border-radius:6px; font-family:monospace; box-sizing:border-box; outline:none;" onkeypress="if(event.key==='Enter') closeCustomDialog(document.getElementById('custom-dialog-input').value)" />
+            </div>
+            <div id="custom-dialog-actions" style="display:flex; justify-content:flex-end; gap:10px; padding:15px 20px; border-top:1px solid #444; background:rgba(0,0,0,0.3); flex-shrink:0;">
+                <button id="custom-dialog-cancel" onclick="closeCustomDialog(false)" style="display:none; padding:8px 16px; background:#444; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Cancel</button>
+                <button id="custom-dialog-send-to-tech" onclick="sendDialogToTech()" style="display:none; padding:8px 16px; background:#f59e0b; color:#000; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Send to Tech</button>
+                <button id="custom-dialog-confirm" onclick="closeCustomDialog(true)" style="padding:8px 16px; background:#34d399; color:#000; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Viewer Modal -->
+    <div id="doc-viewer-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9000; display:none; font-family:monospace;">
+        <div id="doc-viewer-box" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:900px; max-width:95vw; height:90vh; background:rgba(20,20,20,0.98); color:#fff; border-radius:8px; display:flex; flex-direction:column; box-shadow: 0 10px 40px rgba(0,0,0,0.9); overflow:hidden; border: 4px solid #d4a373;">
+            <div id="doc-viewer-header" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:rgba(0,0,0,0.3); border-bottom:2px solid #d4a373; cursor:move; flex-shrink:0;">
+                <h2 id="doc-viewer-title" style="margin:0; font-size:18px; color:#d4a373; font-family:monospace; pointer-events:none;">Document</h2>
+                <button onclick="document.getElementById('doc-viewer-modal').style.display='none'" style="background:transparent; border:none; color:#fff; font-size:24px; cursor:pointer; padding:0; line-height:1; transition:color 0.2s;">×</button>
+            </div>
+            <div id="doc-viewer-content" style="padding:40px 60px; overflow-y:auto; flex-grow:1; line-height:1.7; font-size:15px; color:#e0e0e0; background:rgba(10,10,10,0.5); font-family: sans-serif;"></div>
+        </div>
+    </div>
+
+    <!-- Active Apps Manager Modal -->
+    <div id="app-manager-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none; align-items:center; justify-content:center;">
+        <div id="app-manager-box" style="background:#222; border:4px solid #4ade80; border-radius:8px; width:600px; max-width:90vw; max-height:80vh; display:flex; flex-direction:column; font-family:monospace; color:#fff; box-shadow: 0 10px 40px rgba(74,222,128,0.2);">
+            <div id="app-manager-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #4ade80; padding:15px 20px; background:rgba(74,222,128,0.1); flex-shrink:0; cursor:move;">
+                <h2 style="margin:0; font-size:18px; color:#4ade80; display:flex; align-items:center; gap:10px;">
+                    <span>🌐</span> Deployed Services Registry
+                </h2>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button onclick="scanApps()" style="background:#4ade80; color:#000; border:none; padding:4px 8px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">↻ Refresh</button>
+                    <button onclick="document.getElementById('app-manager-modal').style.display='none'" style="background:transparent; border:none; color:#ef4444; font-size:24px; cursor:pointer; padding:0; line-height:1; margin-left:10px;">×</button>
+                </div>
+            </div>
+            <div id="app-list" style="padding:20px; overflow-y:auto; flex-grow:1; background:#111;">
+                <div style="text-align:center; color:#888;">Scanning ports...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GitHub Push Modal -->
+    <div id="github-push-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none; align-items:center; justify-content:center;">
+        <div id="github-push-box" style="background:#222; border:4px solid #3b82f6; border-radius:8px; width:450px; max-width:90vw; display:flex; flex-direction:column; font-family:monospace; color:#fff; box-shadow: 0 10px 40px rgba(59,130,246,0.2);">
+            <div id="github-push-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #3b82f6; padding:15px 20px; background:rgba(59,130,246,0.1); flex-shrink:0; cursor:move;">
+                <h2 style="margin:0; font-size:18px; color:#3b82f6; display:flex; align-items:center; gap:10px;">
+                    <span>🐙</span> Push to GitHub
+                </h2>
+                <button onclick="document.getElementById('github-push-modal').style.display='none'" style="background:transparent; border:none; color:#ef4444; font-size:24px; cursor:pointer; padding:0; line-height:1; margin-left:10px;">×</button>
+            </div>
+            <div style="padding:20px; display:flex; flex-direction:column; gap:15px; background:#111;">
+                <div>
+                    <label style="color:#aaa; font-size:12px;">GitHub Personal Access Token (Classic)</label>
+                    <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx" style="width:100%; padding:8px; background:#000; border:1px solid #444; color:#fff; margin-top:5px; border-radius:4px; outline:none; font-family:monospace;">
+                </div>
+                <div>
+                    <label style="color:#aaa; font-size:12px;">GitHub Username</label>
+                    <input type="text" id="github-user" placeholder="e.g. torvalds" style="width:100%; padding:8px; background:#000; border:1px solid #444; color:#fff; margin-top:5px; border-radius:4px; outline:none; font-family:monospace;">
+                </div>
+                <div>
+                    <label style="color:#aaa; font-size:12px;">Repository Name (will be created if missing)</label>
+                    <input type="text" id="github-repo" placeholder="e.g. my-awesome-app" style="width:100%; padding:8px; background:#000; border:1px solid #444; color:#fff; margin-top:5px; border-radius:4px; outline:none; font-family:monospace;">
+                </div>
+                <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+                    <button onclick="executePush()" style="background:#3b82f6; color:#fff; font-weight:bold; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">🚀 Push Workspace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Queue Console -->
+    <div id="queue-console" style="position:fixed; bottom:20px; right:20px; width:340px; background:rgba(0,0,0,0.6); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.1); border-radius:12px; z-index:900; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-shadow:0 8px 32px rgba(0,0,0,0.4); overflow:hidden;">
+        <!-- Header -->
+        <div style="background:#8b5a2b; border-bottom:1px solid rgba(0,0,0,0.3); padding:10px 16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="const c = document.getElementById('queue-list-container'); c.style.display = c.style.display==='none'?'block':'none';">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="color:#fff; font-size:14px;">📋</span>
+                <span style="color:#fff; font-weight:700; font-size:13px; letter-spacing:0.5px;">TASK QUEUE</span>
+            </div>
+            <div style="background:#3e2a14; padding:3px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+                <span style="color:#fff; font-size:11px; font-weight:700;" id="queue-count-text">0 PENDING</span>
+            </div>
+        </div>
+        
+        <!-- List Container -->
+        <div id="queue-list-container" style="display:block; max-height:280px; overflow-y:auto;">
+            <!-- Current Task -->
+            <div id="queue-current-task" style="padding:14px 16px; position:relative; overflow:hidden; display:none;">
+                <!-- Glowing background -->
+                <div style="position:absolute; top:-20px; left:-20px; right:-20px; height:100px; background:radial-gradient(ellipse at top left, rgba(52,211,153,0.25) 0%, transparent 70%); pointer-events:none;"></div>
+                
+                <div style="display:flex; align-items:flex-start; gap:12px; position:relative; z-index:1;">
+                    <!-- Pulsing dot -->
+                    <div style="margin-top:4px; position:relative; display:flex; justify-content:center; align-items:center;">
+                        <div style="width:8px; height:8px; background:#34d399; border-radius:50%;"></div>
+                        <div style="position:absolute; width:16px; height:16px; background:rgba(52,211,153,0.4); border-radius:50%; animation:pulse 2s infinite;"></div>
+                    </div>
+                    
+                    <div style="flex-grow:1; overflow:hidden;">
+                        <div style="color:#34d399; font-size:11px; font-weight:800; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+                            <span>⚡</span> EXECUTING NOW
+                        </div>
+                        <div style="color:#fff; font-size:13px; line-height:1.4; word-wrap: break-word;" id="queue-current-text">None</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending List -->
+            <div id="queue-pending-list" style="background:rgba(0,0,0,0.3);">
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/js/state.js?v=2"></script>
+    <script src="/js/app.js?v=2"></script>
+
+</html>

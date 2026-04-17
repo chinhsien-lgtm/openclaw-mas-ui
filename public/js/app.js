@@ -1018,7 +1018,7 @@ window.isInventoryExpanded = false;
 window.killAllAgents = window.killAllAgents = async function killAllAgents() {
             if(!confirm('🚨 EMERGENCY STOP 🚨\n\nAre you sure you want to forcibly terminate all running Agent processes across all projects?')) return;
             try {
-                await const selector = document.getElementById('project-selector');
+                const selector = document.getElementById('project-selector');
                 const proj = (selector && selector.value !== 'new') ? selector.value : '';
                 await fetch('/api/kill', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({project: proj}) });
             } catch(e) { console.error('Failed to kill', e); }

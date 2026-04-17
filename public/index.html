@@ -6,7 +6,7 @@
     <title>Stardew MAS Simulator</title>
     <!-- Pixel Font -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css?v=18">
+    <link rel="stylesheet" href="/css/main.css?v=19">
 </head>
 
 <body>
@@ -91,41 +91,41 @@
             <button id="inventory-expand-btn" onclick="window.toggleInventory()" style="margin-top: -1px; padding: 4px 32px; background: rgba(30, 30, 34, 0.9); border: 1px solid rgba(255,255,255,0.08); border-top: none; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; color: #888; font-size: 10px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">▼</button>
         </div>
     
-        <div id="queue-console" style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); width:500px; max-width:95%; background:rgba(12, 12, 12, 0.85); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:2px solid rgba(255,255,255,0.05); border-radius:12px; z-index:900; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-shadow:0 12px 32px rgba(0,0,0,0.5); overflow:hidden;">
+        <div id="queue-console" style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); width:420px; max-width:95%; background:rgba(20,20,22,0.65); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.1); border-radius:16px; z-index:900; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-shadow:0 12px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05); overflow:hidden;">
             <!-- Header -->
-            <div style="background:#6b4629; padding:8px 16px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; border-bottom: 2px solid #52351d;" onclick="const c = document.getElementById('queue-list-container'); c.style.display = c.style.display==='none'?'block':'none';">
+            <div style="background:rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.08); padding:12px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; transition:background 0.2s;" onclick="const c = document.getElementById('queue-list-container'); c.style.display = c.style.display==='none'?'block':'none';" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span style="color:#fff; font-size:16px; opacity:0.9;">📑</span>
-                    <span style="color:#fff; font-weight:700; font-size:13px; letter-spacing:0.5px; text-shadow:1px 1px 0px rgba(0,0,0,0.3);">TASK QUEUE</span>
+                    <span style="color:#a78bfa; font-size:16px;">⚡</span>
+                    <span style="color:#e2e8f0; font-weight:600; font-size:14px; letter-spacing:0.5px;">TASK QUEUE</span>
                 </div>
-                <div style="background:#381e0d; padding:3px 10px; border-radius:20px; box-shadow:inset 1px 1px 3px rgba(0,0,0,0.5);">
-                    <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.5px;" id="queue-count-text">0 PENDING</span>
+                <div style="background:rgba(0,0,0,0.4); padding:4px 12px; border-radius:20px; border:1px solid rgba(255,255,255,0.05);">
+                    <span style="color:#94a3b8; font-size:11px; font-weight:700;" id="queue-count-text">0 PENDING</span>
                 </div>
             </div>
             
             <!-- List Container -->
-            <div id="queue-list-container" class="custom-scroll" style="display:block; max-height:280px; overflow-y:auto; background:#0c0c0c;">
+            <div id="queue-list-container" class="custom-scroll" style="display:block; max-height:280px; overflow-y:auto;">
                 <!-- Current Task -->
-                <div id="queue-current-task" style="padding:12px 16px; position:relative; overflow:hidden; display:none; background:linear-gradient(90deg, rgba(22,40,23,0.9) 0%, rgba(12,12,12,0.9) 100%); border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; align-items:center; gap:12px; position:relative; z-index:1;">
-                        <div style="position:relative; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
-                            <div style="width:10px; height:10px; background:#4ade80; border-radius:50%; box-shadow:0 0 8px #4ade80;"></div>
-                            <div style="position:absolute; width:20px; height:20px; background:rgba(74,222,128,0.3); border-radius:50%; animation:pulse 1.5s infinite;"></div>
+                <div id="queue-current-task" style="padding:16px 20px; position:relative; overflow:hidden; display:none; background:rgba(52,211,153,0.05); border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div style="position:absolute; top:-30px; left:-30px; right:-30px; height:120px; background:radial-gradient(ellipse at top left, rgba(52,211,153,0.15) 0%, transparent 60%); pointer-events:none;"></div>
+                    <div style="display:flex; align-items:flex-start; gap:12px; position:relative; z-index:1;">
+                        <div style="margin-top:4px; position:relative; display:flex; justify-content:center; align-items:center;">
+                            <div style="width:8px; height:8px; background:#34d399; border-radius:50%;"></div>
+                            <div style="position:absolute; width:16px; height:16px; background:rgba(52,211,153,0.4); border-radius:50%; animation:pulse 2s infinite;"></div>
                         </div>
-                        <div style="flex-grow:1; overflow:hidden; padding-left:4px;">
-                            <div style="color:#4ade80; font-size:10px; font-weight:800; margin-bottom:2px; letter-spacing:0.5px; display:flex; align-items:center; gap:4px;">
-                                <span>⚡</span> EXECUTING NOW
-                            </div>
-                            <div style="color:#fff; font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="queue-current-text">None</div>
+                        <div style="flex-grow:1; overflow:hidden;">
+                            <div style="color:#34d399; font-size:11px; font-weight:700; margin-bottom:6px; letter-spacing:0.5px;">EXECUTING NOW</div>
+                            <div style="color:#f8fafc; font-size:14px; line-height:1.5; word-wrap: break-word;" id="queue-current-text">None</div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Pending List -->
-                <div id="queue-pending-list">
+                <div id="queue-pending-list" style="background:transparent;">
                 </div>
             </div>
         </div>
+    </div>
     </div>
     
     <!-- RIGHT PANEL (Files) -->
@@ -241,21 +241,21 @@
                 </div>
             </div>
         </div></div>
-    </div>
+    
     
 </body>
 
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="/js/state.js?v=18"></script>
-<script src="/js/components/modals.js?v=18"></script>
-<script src="/js/components/auth.js?v=18"></script>
-<script src="/js/components/apps.js?v=18"></script>
-<script src="/js/components/github.js?v=18"></script>
-<script src="/js/components/inventory.js?v=18"></script>
-<script src="/js/components/chat.js?v=18"></script>
-<script src="/js/components/map.js?v=18"></script>
-<script src="/js/app.js?v=18"></script>
+<script src="/js/state.js?v=19"></script>
+<script src="/js/components/modals.js?v=19"></script>
+<script src="/js/components/auth.js?v=19"></script>
+<script src="/js/components/apps.js?v=19"></script>
+<script src="/js/components/github.js?v=19"></script>
+<script src="/js/components/inventory.js?v=19"></script>
+<script src="/js/components/chat.js?v=19"></script>
+<script src="/js/components/map.js?v=19"></script>
+<script src="/js/app.js?v=19"></script>
 
 </html>

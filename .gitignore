@@ -8,3 +8,4 @@ openclaw-mas-ui-out.log
 openclaw-mas-ui-error.log
 auth-profiles.json
 agents/*/agent/auth-profiles.json
+agents/

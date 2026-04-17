@@ -1,98 +1,11 @@
 // Custom Dialog Logic
-        let customDialogPromiseResolve = null;
-        function showCustomDialog(type, title, message, defaultValue = '') {
-            return new Promise((resolve) => {
-                // If it's a hitl modal, we inject raw HTML. Otherwise, we escape and linkify.
-                let finalHtml = message;
-                if (type !== 'hitl') {
-                    // Escape basic HTML to prevent rendering bugs, then linkify and replace newlines
-                    const escaped = message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    finalHtml = escaped.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#60a5fa; text-decoration:underline;">$1</a>').replace(/\n/g, '<br>');
-                }
-
-                document.getElementById('custom-dialog-title').innerText = title;
-                document.getElementById('custom-dialog-actions').style.display = type === 'hitl' ? 'none' : 'flex';
-                
-                // Ensure standard dialog resets buttons
-                document.getElementById('custom-dialog-cancel').style.display = (type === 'confirm' || type === 'prompt') ? 'inline-block' : 'none';
-                document.getElementById('custom-dialog-confirm').style.display = type === 'hitl' ? 'none' : 'inline-block';
-                
-                if (type === 'prompt') {
-                    document.getElementById('custom-dialog-input-container').style.display = 'block';
-                    const inputEl = document.getElementById('custom-dialog-input');
-                    inputEl.value = defaultValue;
-                    setTimeout(() => inputEl.focus(), 50);
-                    document.getElementById('custom-dialog-confirm').onclick = () => closeCustomDialog(document.getElementById('custom-dialog-input').value);
-                } else {
-                    document.getElementById('custom-dialog-input-container').style.display = 'none';
-                    document.getElementById('custom-dialog-confirm').onclick = () => closeCustomDialog(true);
-                }
-                
-                // Show "Send to Tech" button ONLY if the message contains error keywords and it's not a HITL prompt
-                const isError = type !== 'hitl' && (message.toLowerCase().includes('failed') || message.toLowerCase().includes('error'));
-                document.getElementById('custom-dialog-send-to-tech').style.display = isError ? 'inline-block' : 'none';
-                
-                document.getElementById('custom-dialog-message').innerHTML = finalHtml;
-                
-                document.getElementById('custom-dialog-modal').style.display = 'flex';
-                
-                const cancelBtn = document.getElementById('custom-dialog-cancel');
-                if (type === 'confirm') {
-                    cancelBtn.style.display = 'inline-block';
-                    document.getElementById('custom-dialog-box').style.borderColor = '#ef4444';
-                    document.getElementById('custom-dialog-title').style.color = '#ef4444';
-                    document.getElementById('custom-dialog-title').parentElement.style.borderBottomColor = '#ef4444';
-                    document.getElementById('custom-dialog-confirm').style.background = '#ef4444';
-                    document.getElementById('custom-dialog-confirm').style.color = 'white';
-                } else {
-                    cancelBtn.style.display = 'none';
-                    document.getElementById('custom-dialog-box').style.borderColor = '#d4a373';
-                    document.getElementById('custom-dialog-title').style.color = '#d4a373';
-                    document.getElementById('custom-dialog-title').parentElement.style.borderBottomColor = '#d4a373';
-                    document.getElementById('custom-dialog-confirm').style.background = '#d4a373';
-                    document.getElementById('custom-dialog-confirm').style.color = 'black';
-                }
-                
-                customDialogPromiseResolve = resolve;
-                // Force focus on confirm
-                setTimeout(() => document.getElementById('custom-dialog-confirm').focus(), 50);
-            });
-        }
-        function closeCustomDialog(result) {
-            document.getElementById('custom-dialog-modal').style.display = 'none';
-            if (customDialogPromiseResolve) {
-                if (result === false && document.getElementById('custom-dialog-input-container').style.display === 'block') {
-                    // if they clicked cancel or X on prompt
-                    customDialogPromiseResolve(null);
-                } else {
-                    customDialogPromiseResolve(result);
-                }
-                customDialogPromiseResolve = null;
-            }
-        }
-
-        function sendDialogToTech() {
-            const errMessage = document.getElementById('custom-dialog-message').innerText;
-            const promptText = `Team, I encountered the following deployment/push error. Please analyze this error log and fix the underlying issue immediately:\n\n${errMessage}`;
-            
-            // Put it into the chat input and auto-send
-            document.getElementById('chat-input').value = promptText;
-            closeCustomDialog(true);
-            
-            // Switch to GLOBAL view if not already there, then send
-            setView('GLOBAL');
-            setTimeout(() => sendBroadcast(), 100);
-        }
         
-        async function customAlert(message) {
-            await showCustomDialog('alert', 'Notice', message);
-        }
-        async function customConfirm(message) {
-            return await showCustomDialog('confirm', 'Confirm Action', message);
-        }
-        async function customPrompt(message, defaultValue = '') {
-            return await showCustomDialog('prompt', 'Input Required', message, defaultValue);
-        }
+        
+
+
+
+
+
 
         // JWT Auth
                 const API_TOKEN = localStorage.getItem('mas_auth_token');
@@ -103,41 +16,6 @@
             document.getElementById('login-user').focus();
         }
 
-        async function doLogin() {
-            const u = document.getElementById('login-user').value.trim();
-            const p = document.getElementById('login-pass').value.trim();
-            const errDiv = document.getElementById('login-error');
-            const btn = document.getElementById('login-btn');
-            
-            if(!u || !p) { errDiv.innerText = "Please enter credentials"; return; }
-            
-            btn.disabled = true;
-            btn.innerHTML = "Authenticating...";
-            errDiv.innerText = "";
-            
-            try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username: u, password: p})
-                });
-                const data = await res.json();
-                if(data.success) {
-                    localStorage.setItem('mas_auth_token', data.token);
-                    document.getElementById('login-modal').style.opacity = '0';
-                    setTimeout(() => { document.getElementById('login-modal').style.display = 'none'; }, 300);
-                    if (window.socketInit) window.socketInit();
-                    if (typeof loadProjects === 'function') loadProjects();
-                } else {
-                    errDiv.innerText = data.error || "Login failed";
-                }
-            } catch(e) {
-                errDiv.innerText = "Network error";
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = "Login";
-            }
-        }
 
         // Add Bearer token to all fetch calls by overriding window.fetch
         const originalFetch = window.fetch;
@@ -217,7 +95,7 @@
             Array.from(container.children).forEach(child => traverse(child));
         };
 
-        async function loadFileTree() {
+        window.loadFileTree = async function loadFileTree() {
             const selector = document.getElementById('project-selector');
             const proj = (selector && selector.value !== 'new') ? selector.value : '';
             try {
@@ -278,7 +156,7 @@
         
         // Auto-refresh file tree occasionally or hook into loadProjects
         let bubbleTimeouts = {};
-let isInventoryExpanded = false;
+window.isInventoryExpanded = false;
         const socket = io();
         const chatLog = document.getElementById('chat-log');
         const input = document.getElementById('chat-input');
@@ -541,11 +419,11 @@ let isInventoryExpanded = false;
                 const data = await res.json();
                 if (data.logs) {
                     window.MAS_STATE.allLogs = data.logs;
-                    renderLogs();
+                    window.renderLogs();
                 }
                 if (data.deliverables) {
                     window.MAS_STATE.files = data.deliverables;
-                    renderInventory();
+                    window.renderInventory();
                 }
                 if (typeof loadFileTree === 'function') loadFileTree();
             } catch(e) { console.error(e); }
@@ -591,7 +469,7 @@ let isInventoryExpanded = false;
             }
         }
 
-        async function loadProjects(selectName = null) {
+        window.loadProjects = async function loadProjects(selectName = null) {
             try {
                 const res = await fetch('/api/projects');
                 const data = await res.json();
@@ -639,6 +517,7 @@ let isInventoryExpanded = false;
                 selectorHidden.value = val;
                 loadProjectState();
                 renderCustomDropdown(val);
+                if (typeof window.loadFileTree === 'function') window.loadFileTree();
             }
         };
 
@@ -736,6 +615,7 @@ let isInventoryExpanded = false;
                 selectorHidden.value = val;
                 if (typeof loadProjectState === 'function') loadProjectState();
                 renderCustomDropdown(val);
+                if (typeof window.loadFileTree === 'function') window.loadFileTree();
             }
         };
 
@@ -799,7 +679,7 @@ let isInventoryExpanded = false;
         });
 
         
-        window.window.MAS_STATE.currentProjectName = '';
+        window.MAS_STATE.currentProjectName = '';
         window.loadProjectState = async function loadProjectState() {
             const selector = document.getElementById('project-selector');
             const proj = (selector && selector.value !== 'new') ? selector.value : '';
@@ -809,43 +689,95 @@ let isInventoryExpanded = false;
                 const data = await res.json();
                 if (data.logs) {
                     window.MAS_STATE.allLogs = data.logs;
-                    renderLogs();
+                    window.renderLogs();
                 }
                 if (data.deliverables) {
                     window.MAS_STATE.files = data.deliverables;
-                    renderInventory();
+                    window.renderInventory();
                 }
                 if (data.queue) {
-                        const countText = document.getElementById('queue-count-text');
-    const currentText = document.getElementById('queue-current-text');
-    const currentTaskBox = document.getElementById('queue-current-task');
-    const list = document.getElementById('queue-pending-list');
-    
-    if (!countText) return;
-    
-    countText.innerText = (data.pending ? data.pending.length : 0) + ' PENDING';
-    
-    if (data.isRunning) {
-        if(currentTaskBox) currentTaskBox.style.display = 'block';
-        if(currentText) currentText.innerText = data.currentTask ? data.currentTask.rawMessage : 'None';
-    } else {
-        if(currentTaskBox) currentTaskBox.style.display = 'none';
-        if(currentText) currentText.innerText = 'None';
-    }
-    
-    let qhtml = '';
-    if (data.pending) {
-        data.pending.forEach((task, idx) => {
-            qhtml += `<div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 12px; opacity: 0.7;">
-                    <div style="color: #888; font-size: 12px; font-weight: bold; width: 16px; text-align: center; margin-top:2px;">${idx + 1}</div>
-                    <div style="flex-grow: 1; overflow: hidden;">
-                        <div style="color: #ccc; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${task.rawMessage}</div>
-                    </div>
-                    <button onclick="fetch('/api/kill', {method:'POST'}); setTimeout(()=>loadProjectState(), 1000);" style="background:transparent; border:1px solid #ef4444; color:#ef4444; padding:2px 6px; border-radius:4px; cursor:pointer; font-size:11px; flex-shrink:0;">Cancel</button>
-                </div>`;
+                    if (typeof renderQueue === 'function') {
+                        window.MAS_STATE.queue = data.queue;
+                        window.renderQueue();
+                    }
+                }
+            } catch(e) {}
+        };
+
+        
+        socket.on('new_log', (logObj) => {
+            if (!window.MAS_STATE) return;
+            window.MAS_STATE.allLogs.push(logObj);
+            // if(window.MAS_STATE.allLogs.length > 300) window.MAS_STATE.allLogs.shift();
+            
+            const isRelevant = (window.MAS_STATE.currentView === 'GLOBAL') || 
+                               (window.MAS_STATE.currentView === logObj.from) || 
+                               (window.MAS_STATE.currentView === logObj.to);
+                               
+            if (isRelevant) {
+                if (typeof appendLog === 'function') window.appendLog(logObj);
+                if (window.innerWidth <= 768 && !leftPanel.classList.contains('expanded') && logObj.from !== 'Boss') {
+                    const badge = document.getElementById('chat-badge');
+                    if (badge) badge.style.display = 'block';
+                }
+            }
         });
-    }
-    if(list) list.innerHTML = qhtml;
+
+        socket.on('agent_event', (data) => {
+            if (!window.MAS_STATE) return;
+            const { agent, type, message, actionTarget, project } = data;
+            const selector = document.getElementById('project-selector');
+            const currentProject = (selector && selector.value !== 'new') ? selector.value : '';
+            const eventProject = project || '';
+            if (currentProject !== eventProject && eventProject !== '') return;
+
+            if(!window.MAS_STATE.officeRoster[agent]) return;
+            const dataObj = window.MAS_STATE.officeRoster[agent];
+            
+            if (type === 'autonomous' || type === 'chatting') {
+                if (typeof showBubble === 'function') window.showBubble(agent, message);
+                dataObj.dir = Math.random() > 0.5 ? 1 : 2;
+                setTimeout(() => dataObj.dir = 0, 2000);
+            } else {
+                if (typeof window.MAS_ACTIONS !== 'undefined') window.MAS_ACTIONS.moveAgent(agent, actionTarget);
+                if(message && typeof showBubble === 'function') window.showBubble(agent, message);
+            }
+        });
+
+        socket.on('deliverable_ready', (file) => {
+            if (!window.MAS_STATE) return;
+            window.MAS_STATE.files.push(file);
+            if (typeof renderInventory === 'function') window.renderInventory();
+        });
+
+        socket.on('init_state', (data) => {
+            if (!window.MAS_STATE) return;
+            window.MAS_STATE.allLogs = data.logs || [];
+            if(data.deliverables) { window.MAS_STATE.files = data.deliverables; }
+            if (typeof renderLogs === 'function') window.renderLogs();
+            if (typeof renderInventory === 'function') window.renderInventory(); 
+        });
+        
+        socket.on('clear_history', (data) => {
+            const selector = document.getElementById('project-selector');
+            const currentProject = (selector && selector.value !== 'new') ? selector.value : '';
+            const clearProject = data && data.project !== undefined ? data.project : '';
+            if (currentProject === clearProject) {
+                const cl = document.getElementById('chat-log');
+                if (cl) cl.innerHTML = '';
+            }
+        });
+
+        socket.on('queue_update', (data) => {
+            const selectorHidden = document.getElementById('project-selector');
+            const currentProject = (selectorHidden && selectorHidden.value !== 'new') ? selectorHidden.value : '';
+            const eventProject = data.project || 'main';
+            if (currentProject !== eventProject && eventProject !== 'main') return;
+            
+            if (typeof renderQueue === 'function') {
+                window.MAS_STATE.queue = data;
+                window.renderQueue();
+            }
         });
 
         socket.on('hitl_request', (data) => {
@@ -901,10 +833,10 @@ let isInventoryExpanded = false;
                         pContainer = document.createElement('div');
                         pContainer.id = 'hitl-progress-container';
                         pContainer.style.position = 'absolute';
-                        pContainer.style.bottom = '0';
+                        pContainer.style.bottom = '-2px';
                         pContainer.style.left = '0';
                         pContainer.style.width = '100%';
-                        pContainer.style.height = '3px';
+                        pContainer.style.height = '2px';
                         pContainer.style.background = 'rgba(255,255,255,0.1)';
                         pContainer.innerHTML = '<div id="hitl-progress-bar" style="width: 100%; height: 100%; background: #34d399; transition: width 0.1s linear;"></div>';
                         header.style.position = 'relative';
@@ -1079,8 +1011,242 @@ let isInventoryExpanded = false;
             } catch(e) {}
         };
 
-        window.scanApps = function() {
-            if (typeof showAppManager === 'function') showAppManager();
+        ;
+
+
+
+window.killAllAgents = window.killAllAgents = async function killAllAgents() {
+            if(!confirm('🚨 EMERGENCY STOP 🚨\n\nAre you sure you want to forcibly terminate all running Agent processes across all projects?')) return;
+            try {
+                await fetch('/api/kill', { method: 'POST' });
+            } catch(e) { console.error('Failed to kill', e); }
         };
 
-window.showAppManager = showAppManager;
+;
+
+;
+
+;
+
+;
+
+;
+
+window.makeDraggable = window.makeDraggable = function makeDraggable(boxId, headerId) {
+            const elmnt = document.getElementById(boxId);
+            const header = document.getElementById(headerId);
+            if (!elmnt || !header) return;
+
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            header.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                // Convert percentage/transform centering to absolute pixels if first time
+                if (elmnt.style.transform !== 'none') {
+                    const rect = elmnt.getBoundingClientRect();
+                    elmnt.style.transform = 'none';
+                    elmnt.style.top = rect.top + 'px';
+                    elmnt.style.left = rect.left + 'px';
+                }
+
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        };
+
+window.dragMouseDown = function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                // Convert percentage/transform centering to absolute pixels if first time
+                if (elmnt.style.transform !== 'none') {
+                    const rect = elmnt.getBoundingClientRect();
+                    elmnt.style.transform = 'none';
+                    elmnt.style.top = rect.top + 'px';
+                    elmnt.style.left = rect.left + 'px';
+                }
+
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            };
+
+window.elementDrag = function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            };
+
+window.closeDragElement = function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            };
+
+
+
+        
+window.executePush = async function executePush() {
+            const username = document.getElementById('github-user').value.trim();
+            const repo = document.getElementById('github-repo').value.trim();
+            const token = document.getElementById('github-token').value.trim();
+
+            if (!username || !repo || !token) {
+                await customAlert('Please fill out all fields.');
+                return;
+            }
+
+            // Save for future
+            localStorage.setItem('gh_username', username);
+            localStorage.setItem('gh_token', token);
+
+            document.getElementById('github-push-modal').style.display = 'none';
+            document.getElementById('app-list').innerHTML = '<div style="text-align:center; color:#34d399; font-weight:bold;">Pushing to GitHub... This might take a few seconds.</div>';
+            
+            try {
+                const res = await fetch('/api/apps/push', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pid: activePushPid, token, repo, username })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    await customAlert('Successfully pushed to GitHub!\n\nURL:\n' + data.url);
+                    window.open(data.url, '_blank');
+                } else {
+                    await customAlert('Failed to push to GitHub:\n\n' + data.error);
+                }
+            } catch(e) {
+                await customAlert('Network error pushing to GitHub');
+            }
+            showAppManager();
+        };
+
+        // --- Draggable Modals Logic ---
+        window.makeDraggable = function makeDraggable(boxId, headerId) {
+            const elmnt = document.getElementById(boxId);
+            const header = document.getElementById(headerId);
+            if (!elmnt || !header) return;
+
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            header.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                
+                // Convert percentage/transform centering to absolute pixels if first time
+                if (elmnt.style.transform !== 'none') {
+                    const rect = elmnt.getBoundingClientRect();
+                    elmnt.style.transform = 'none';
+                    elmnt.style.top = rect.top + 'px';
+                    elmnt.style.left = rect.left + 'px';
+                }
+
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // Initialize drag on modals
+        window.makeDraggable('app-manager-box', 'app-manager-header');
+        window.makeDraggable('github-push-box', 'github-push-header');
+        window.makeDraggable('custom-dialog-box', 'custom-dialog-header');
+        window.makeDraggable('doc-viewer-box', 'doc-viewer-header');
+    
+        // Setup hooks at the very end
+        const originalLoadProjects = window.loadProjects;
+        loadProjects = async function(selectName = null) {
+            await originalLoadProjects(selectName);
+            if (typeof loadProjectState === 'function') loadProjectState();
+        };
+        const selectorEl = document.getElementById('project-selector');
+        if (selectorEl) {
+            selectorEl.addEventListener('change', () => { if (typeof loadFileTree === 'function') loadFileTree(); });
+        }
+
+
+
+// Trigger initializations on load
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof loadProjects === 'function' || typeof window.loadProjects === 'function') {
+        const lp = window.loadProjects || loadProjects;
+        lp();
+    }
+    if (typeof loadFileTree === 'function' || typeof window.loadFileTree === 'function') {
+        const lf = window.loadFileTree || loadFileTree;
+        lf();
+    }
+    if (typeof window.loadProjectState === 'function') {
+        window.loadProjectState();
+    }
+});
+
+// --- RESTORED MISSING FUNCTIONS ---
+
+
+
+
+
+
+
+
+
+
+
+;
+
+        window.isInventoryExpanded = false;
+        
+
+
+
+
+

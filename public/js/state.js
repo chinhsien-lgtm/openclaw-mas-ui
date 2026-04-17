@@ -83,7 +83,7 @@ window.MAS_ACTIONS = {
 
 window.renderQueue = function() {
     const queue = window.MAS_STATE.queue;
-        const countText = document.getElementById('queue-count-text');
+                        const countText = document.getElementById('queue-count-text');
     const currentText = document.getElementById('queue-current-text');
     const currentTaskBox = document.getElementById('queue-current-task');
     const list = document.getElementById('queue-pending-list');
@@ -103,12 +103,12 @@ window.renderQueue = function() {
     let qhtml = '';
     if (queue.pending) {
         queue.pending.forEach((task, idx) => {
-            qhtml += `<div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 12px; opacity: 0.7;">
-                    <div style="color: #888; font-size: 12px; font-weight: bold; width: 16px; text-align: center; margin-top:2px;">${idx + 1}</div>
+            qhtml += `<div style="padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; background: transparent; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                    <div style="color: #666; font-size: 12px; font-weight: bold; width: 16px; text-align: center;">${idx + 1}</div>
                     <div style="flex-grow: 1; overflow: hidden;">
-                        <div style="color: #ccc; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${task.rawMessage}</div>
+                        <div style="color: #ccc; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">${task.rawMessage}</div>
                     </div>
-                    <button onclick="fetch('/api/kill', {method:'POST'}); setTimeout(()=>loadProjectState(), 1000);" style="background:transparent; border:1px solid #ef4444; color:#ef4444; padding:2px 6px; border-radius:4px; cursor:pointer; font-size:11px; flex-shrink:0;">Cancel</button>
+                    <button onclick="fetch('/api/kill', {method:'POST'}); setTimeout(()=>{if(typeof window.loadProjectState==='function') window.loadProjectState();}, 1000);" style="background:transparent; border:none; color:#f87171; padding:0; cursor:pointer; font-size:12px; font-weight:bold; opacity:0.8; transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✖</button>
                 </div>`;
         });
     }

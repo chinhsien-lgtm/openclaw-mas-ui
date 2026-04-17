@@ -108,7 +108,7 @@ window.renderQueue = function() {
                     <div style="flex-grow: 1; overflow: hidden;">
                         <div style="color: #ccc; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">${task.rawMessage}</div>
                     </div>
-                    <button onclick="fetch('/api/kill', {method:'POST'}); setTimeout(()=>{if(typeof window.loadProjectState==='function') window.loadProjectState();}, 1000);" style="background:transparent; border:none; color:#f87171; padding:0; cursor:pointer; font-size:12px; font-weight:bold; opacity:0.8; transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✖</button>
+                    <button onclick="fetch('/api/queue/remove', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({project: window.MAS_STATE.currentProjectName, index: idx})}); setTimeout(()=>{if(typeof window.loadProjectState==='function') window.loadProjectState();}, 1000);" style="background:transparent; border:none; color:#f87171; padding:0; cursor:pointer; font-size:12px; font-weight:bold; opacity:0.8; transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">✖</button>
                 </div>`;
         });
     }

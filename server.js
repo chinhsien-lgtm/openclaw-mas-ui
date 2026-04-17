@@ -439,37 +439,93 @@ app.get('/api/read_log', (req, res) => {
 
 
 // KILL ALL AGENTS API
-app.post('/api/kill', (req, res) => {
+app.post('/api/kill', async (req, res) => {
     try {
         require('child_process').execSync('pkill -f "openclaw agent"');
         require('child_process').execSync('pkill -f "mas_swarm.js"');
-    } catch(e) {
-        // pkill exits with 1 if no process found, which is fine
+    } catch(e) {}
+    
+    const { project } = req.body;
+    const projKey = project || 'main';
+    
+    // Clear the queue for this project
+    if (projectQueues[projKey]) {
+        projectQueues[projKey].pending = [];
+        projectQueues[projKey].isRunning = false;
+        projectQueues[projKey].currentTask = null;
     }
     
-    chatSessionSuffix = 'chat_' + Date.now();
-    systemLogs = [{ type: 'global', from: 'System', text: '🛑 [Emergency Stop] Forcibly terminated all AI employee processes and reset all contextual memories for current tasks!', timestamp: Date.now() }];
-    deliverables = [];
     
-    Object.keys(activeAgents).forEach(k => {
-        activeAgents[k].status = 'idle';
-        emitAction(k, 'idle', 'Standby');
+    const roster = ['CEO', 'CPO', 'CTO', 'Programmer', 'Tester', 'Reviewer', 'Data Analyst', 'Researcher'];
+    roster.forEach(k => {
+        io.emit('agent_event', { project: projKey, agent: k, type: 'autonomous', message: 'Standby', actionTarget: 'home' });
     });
+    const emergencyMsg = '🛑 [Emergency Stop] Forcibly terminated all AI employee processes and cleared the pending queue.';
+    
+    // Push to Supabase instead of memory wipe
+    const { error } = await supabase.from('mas_chat_logs').insert([{
+        project: projKey,
+        type: 'global',
+        sender: 'System',
+        receiver: null,
+        text: emergencyMsg
+    }]);
 
-    io.emit('clear_history');
-    io.emit('init_state', { agents: activeAgents, logs: systemLogs, deliverables, queues: projectQueues });
+    if (!error) {
+        io.emit('new_log', {
+            project: projKey,
+            type: 'global',
+            from: 'System',
+            to: null,
+            text: emergencyMsg,
+            timestamp: Date.now()
+        });
+    }
+
+    io.emit('queue_update', Object.assign({ project: projKey }, projectQueues[projKey]));
     res.json({ success: true });
 });
 
-app.post('/api/clear', (req, res) => {
-    // Generate a new session suffix to wipe conversation history but KEEP disk memory!
-    chatSessionSuffix = 'chat_' + Date.now();
+app.post('/api/queue/remove', (req, res) => {
+    const { project, index } = req.body;
+    const projKey = project || 'main';
+    if (projectQueues[projKey] && projectQueues[projKey].pending) {
+        projectQueues[projKey].pending.splice(index, 1);
+        io.emit('queue_update', Object.assign({ project: projKey }, projectQueues[projKey]));
+    }
+    res.json({ success: true });
+});
+
+app.post('/api/clear', async (req, res) => {
+    const { project } = req.body;
+    const projKey = project || 'main';
     
-    systemLogs = [{ type: 'global', from: 'System', text: '[Grafilab] Records cleared, underlying employee session memories reset (disk files like TODO_LOG retained).', timestamp: Date.now() }];
-    deliverables = [];
-    saveState();
-    io.emit('clear_history');
-    io.emit('init_state', { agents: activeAgents, logs: systemLogs, deliverables, queues: projectQueues });
+    // Filter out logs and deliverables for this project
+    systemLogs = systemLogs.filter(l => (l.project || 'main') !== projKey);
+    deliverables = deliverables.filter(d => (d.project || 'main') !== projKey);
+    
+    // Create clear event log
+    const clearLog = { project: projKey, type: 'global', from: 'System', text: '🗑️ [Grafilab] Records cleared. Employee session memories reset.', timestamp: Date.now() };
+    systemLogs.push(clearLog);
+    
+    // Wipe from Supabase
+    try {
+        await supabase.from('mas_chat_logs').delete().eq('project', projKey);
+        await supabase.from('mas_deliverables').delete().eq('project', projKey);
+        
+        // Save the clear log
+        await supabase.from('mas_chat_logs').insert([{
+            project: projKey,
+            type: 'global',
+            sender: 'System',
+            receiver: null,
+            text: clearLog.text
+        }]);
+    } catch(e) {}
+    
+    io.emit('clear_history', { project: projKey });
+    io.emit('new_log', clearLog);
+    
     res.json({ success: true });
 });
 

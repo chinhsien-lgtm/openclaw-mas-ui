@@ -48,7 +48,7 @@ window.toggleFileMenu = function toggleFileMenu(index, event) {
             const menus = document.querySelectorAll('[id^="file-menu-"]');
             menus.forEach(m => m.style.display = 'none');
             const menu = document.getElementById(`file-menu-${index}`);
-            if (menu) menu.style.display = 'flex';
+            if (menu) menu.style.display = 'block';
         };
 
 window.viewDocument = function viewDocument(index) {
@@ -58,7 +58,7 @@ window.viewDocument = function viewDocument(index) {
             if (f.type === 'image') {
                 document.getElementById('doc-viewer-title').innerText = f.name;
                 document.getElementById('doc-viewer-content').innerHTML = `<img src="${f.content || f.url}" style="max-width:100%; border-radius:4px;">`;
-                document.getElementById('doc-viewer-modal').style.display = 'flex';
+                document.getElementById('doc-viewer-modal').style.display = 'block';
                 return;
             }
             
@@ -91,7 +91,7 @@ window.viewDocument = function viewDocument(index) {
 
             document.getElementById('doc-viewer-title').innerText = f.name;
             document.getElementById('doc-viewer-content').innerHTML = htmlText;
-            document.getElementById('doc-viewer-modal').style.display = 'flex';
+            document.getElementById('doc-viewer-modal').style.display = 'block';
         };
 
 window.deleteDeliverable = async function deleteDeliverable(name) {

@@ -6,7 +6,7 @@
     <title>Stardew MAS Simulator</title>
     <!-- Pixel Font -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css?v=13">
+    <link rel="stylesheet" href="/css/main.css?v=16">
 </head>
 
 <body>
@@ -144,9 +144,10 @@
 
 
 <!-- Modals -->
-    <div id="login-modal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:9999; flex-direction:column; font-family:monospace;">
-        <h1 style="color:#4ade80; font-size:48px; margin-bottom:20px; text-shadow:2px 2px 0px #000;">Terminal Access</h1>
-        <div style="background:#222; border:4px solid #4ade80; padding:30px; border-radius:8px; display:flex; flex-direction:column; gap:15px; width:400px; box-shadow:0 0 20px rgba(74,222,128,0.3);">
+    <div id="login-modal" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.9);    z-index:9999; display:block; font-family:monospace;">
+        <div id="login-wrapper" style="display:flex; flex-direction:column; align-items:center; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); ">
+            <h1 id="login-header" style="color:#4ade80; font-size:48px; margin-bottom:20px; text-shadow:2px 2px 0px #000; cursor:move;">Terminal Access</h1>
+            <div id="login-box" style="position:relative; background:#222; border:4px solid #4ade80; padding:30px; border-radius:8px; display:flex; flex-direction:column; gap:15px; width:400px; box-shadow:0 0 20px rgba(74,222,128,0.3);">
             <input type="text" id="login-user" placeholder="Username" style="width:100%; padding:10px; background:#000; border:2px solid #4ade80; color:#4ade80; font-size:16px; outline:none; box-sizing:border-box;" />
             <div style="position:relative; display:flex; align-items:center; width:100%;">
                 <input type="password" id="login-pass" placeholder="Password" onkeydown="if(event.key==='Enter') doLogin()" style="flex-grow:1; padding:10px; padding-right:45px; background:#000; border:2px solid #4ade80; color:#4ade80; font-size:16px; outline:none; box-sizing:border-box;" />
@@ -154,6 +155,7 @@
             </div>
             <button id="login-btn" onclick="doLogin()" style="padding:12px; background:#4ade80; color:#000; border:none; font-weight:bold; cursor:pointer; font-size:18px;">LOGIN</button>
             <div id="login-error" style="color:#ef4444; font-weight:bold; text-align:center; min-height:20px;"></div>
+        </div>
         </div>
     </div>
 
@@ -177,8 +179,8 @@
         </div>
     </div>
 
-    <div id="doc-viewer-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,12,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9000; display:none; justify-content:center; align-items:center; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-        <div id="doc-viewer-box" style="position:relative; width:95vw; max-width:960px; height:85vh; background:rgba(25,25,28,0.95); color:#f1f5f9; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); overflow:hidden;">
+    <div id="doc-viewer-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,12,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9000; display:none;   font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div id="doc-viewer-box" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);  width:95vw; max-width:960px; height:85vh; background:rgba(25,25,28,0.95); color:#f1f5f9; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); overflow:hidden;">
             <!-- Header -->
             <div id="doc-viewer-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.08); cursor:move; flex-shrink:0;">
                 <div style="display:flex; align-items:center; gap:12px;">
@@ -192,8 +194,8 @@
         </div>
     </div>/div>
 
-    <div id="app-manager-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none; align-items:center; justify-content:center;">
-        <div id="app-manager-box" style="background:#222; border:4px solid #4ade80; border-radius:8px; width:600px; max-width:90vw; max-height:80vh; display:flex; flex-direction:column; font-family:monospace; color:#fff; box-shadow: 0 10px 40px rgba(74,222,128,0.2);">
+    <div id="app-manager-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none;  ">
+        <div id="app-manager-box" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#222; border:4px solid #4ade80; border-radius:8px; width:600px; max-width:90vw; max-height:80vh; display:flex; flex-direction:column; font-family:monospace; color:#fff; box-shadow: 0 10px 40px rgba(74,222,128,0.2);">
             <div id="app-manager-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #4ade80; padding:15px 20px; background:rgba(74,222,128,0.1); flex-shrink:0; cursor:move;">
                 <h2 style="margin:0; font-size:18px; color:#4ade80; display:flex; align-items:center; gap:10px;">
                     <span>🌐</span> Deployed Services Registry
@@ -209,32 +211,36 @@
         </div>
     </div>
 
-    <div id="github-push-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none; align-items:center; justify-content:center;">
-        <div id="github-push-box" style="background:#222; border:4px solid #3b82f6; border-radius:8px; width:450px; max-width:90vw; display:flex; flex-direction:column; font-family:monospace; color:#fff; box-shadow: 0 10px 40px rgba(59,130,246,0.2);">
-            <div id="github-push-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #3b82f6; padding:15px 20px; background:rgba(59,130,246,0.1); flex-shrink:0; cursor:move;">
-                <h2 style="margin:0; font-size:18px; color:#3b82f6; display:flex; align-items:center; gap:10px;">
-                    <span>🐙</span> Push to GitHub
-                </h2>
-                <button onclick="document.getElementById('github-push-modal').style.display='none'" style="background:transparent; border:none; color:#ef4444; font-size:24px; cursor:pointer; padding:0; line-height:1; margin-left:10px;">×</button>
+    <div id="github-push-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,12,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9999; display:none;   font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div id="github-push-box" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);  width:480px; max-width:90vw; background:rgba(25,25,28,0.95); color:#f1f5f9; border-radius:12px; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05); border:1px solid rgba(59,130,246,0.3); overflow:hidden;">
+            <div id="github-push-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:rgba(59,130,246,0.1); border-bottom:1px solid rgba(59,130,246,0.2); cursor:move; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="color:#60a5fa; font-size:18px;">🐙</span>
+                    <h2 style="margin:0; font-size:16px; font-weight:600; color:#bfdbfe; letter-spacing:0.5px;">Push to GitHub</h2>
+                </div>
+                <button onclick="document.getElementById('github-push-modal').style.display='none'" style="background:transparent; border:none; color:#94a3b8; font-size:24px; cursor:pointer; padding:4px; line-height:1; transition:color 0.2s;" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#94a3b8'">×</button>
             </div>
-            <div style="padding:20px; display:flex; flex-direction:column; gap:15px; background:#111;">
-                <div>
-                    <label style="color:#aaa; font-size:12px;">GitHub Personal Access Token (Classic)</label>
-                    <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx" style="width:100%; padding:8px; background:#000; border:1px solid #444; color:#fff; margin-top:5px; border-radius:4px; outline:none; font-family:monospace;">
+            <div style="padding:24px; display:flex; flex-direction:column; gap:16px; background:transparent;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label style="color:#94a3b8; font-size:12px; font-weight:500; letter-spacing:0.5px; text-transform:none;">GitHub Personal Access Token (Classic)</label>
+                        <a href="https://github.com/settings/tokens/new?scopes=repo,workflow" target="_blank" style="color:#60a5fa; text-decoration:none; font-size:11px; transition:color 0.2s;" onmouseover="this.style.color='#93c5fd'" onmouseout="this.style.color='#60a5fa'">Generate PAT ↗</a>
+                    </div>
+                    <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxx" style="width:100%; padding:10px 12px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); color:#e2e8f0; border-radius:6px; outline:none; font-family:monospace; font-size:14px; box-sizing:border-box; transition:border 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                 </div>
-                <div>
-                    <label style="color:#aaa; font-size:12px;">GitHub Username</label>
-                    <input type="text" id="github-user" placeholder="e.g. torvalds" style="width:100%; padding:8px; background:#000; border:1px solid #444; color:#fff; margin-top:5px; border-radius:4px; outline:none; font-family:monospace;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="color:#94a3b8; font-size:12px; font-weight:500; letter-spacing:0.5px; text-transform:none;">GitHub Username</label>
+                    <input type="text" id="github-user" placeholder="e.g. torvalds" style="width:100%; padding:10px 12px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); color:#e2e8f0; border-radius:6px; outline:none; font-family:monospace; font-size:14px; box-sizing:border-box; transition:border 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                 </div>
-                <div>
-                    <label style="color:#aaa; font-size:12px;">Repository Name (will be created if missing)</label>
-                    <input type="text" id="github-repo" placeholder="e.g. my-awesome-app" style="width:100%; padding:8px; background:#000; border:1px solid #444; color:#fff; margin-top:5px; border-radius:4px; outline:none; font-family:monospace;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="color:#94a3b8; font-size:12px; font-weight:500; letter-spacing:0.5px; text-transform:none;">Repository Name (will be created if missing)</label>
+                    <input type="text" id="github-repo" placeholder="e.g. my-awesome-app" style="width:100%; padding:10px 12px; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); color:#e2e8f0; border-radius:6px; outline:none; font-family:monospace; font-size:14px; box-sizing:border-box; transition:border 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                 </div>
-                <div style="margin-top:10px; display:flex; justify-content:flex-end;">
-                    <button onclick="executePush()" style="background:#3b82f6; color:#fff; font-weight:bold; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">🚀 Push Workspace</button>
+                <div style="margin-top:12px; display:flex; justify-content:flex-end;">
+                    <button onclick="window.executePush()" style="background:#3b82f6; color:#fff; font-weight:600; font-size:14px; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; box-shadow:0 4px 12px rgba(59,130,246,0.3); transition:background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">🚀 Push Workspace</button>
                 </div>
             </div>
-        </div>
+        </div></div>
     </div>
     
 </body>
@@ -242,14 +248,14 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="/js/state.js?v=13"></script>
-<script src="/js/components/modals.js?v=13"></script>
-<script src="/js/components/auth.js?v=13"></script>
-<script src="/js/components/apps.js?v=13"></script>
-<script src="/js/components/github.js?v=13"></script>
-<script src="/js/components/inventory.js?v=13"></script>
-<script src="/js/components/chat.js?v=13"></script>
-<script src="/js/components/map.js?v=13"></script>
-<script src="/js/app.js?v=13"></script>
+<script src="/js/state.js?v=16"></script>
+<script src="/js/components/modals.js?v=16"></script>
+<script src="/js/components/auth.js?v=16"></script>
+<script src="/js/components/apps.js?v=16"></script>
+<script src="/js/components/github.js?v=16"></script>
+<script src="/js/components/inventory.js?v=16"></script>
+<script src="/js/components/chat.js?v=16"></script>
+<script src="/js/components/map.js?v=16"></script>
+<script src="/js/app.js?v=16"></script>
 
 </html>

@@ -31,7 +31,7 @@ window.killApp = async function killApp(pid) {
         };
 
 window.showAppManager = async function showAppManager() {
-            document.getElementById('app-manager-modal').style.display = 'flex';
+            document.getElementById('app-manager-modal').style.display = 'block';
             document.getElementById('app-list').innerHTML = '<div style="text-align:center; color:#aaa;">Scanning ports...</div>';
             try {
                 const res = await fetch('/api/apps');

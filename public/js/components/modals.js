@@ -33,7 +33,7 @@ function showCustomDialog(type, title, message, defaultValue = '') {
                 
                 document.getElementById('custom-dialog-message').innerHTML = finalHtml;
                 
-                document.getElementById('custom-dialog-modal').style.display = 'flex';
+                document.getElementById('custom-dialog-modal').style.display = 'block';
                 
                 const cancelBtn = document.getElementById('custom-dialog-cancel');
                 if (type === 'confirm') {
@@ -96,3 +96,64 @@ window.customPrompt = async function customPrompt(message, defaultValue = '') {
             return await showCustomDialog('prompt', 'Input Required', message, defaultValue);
         };
 
+
+
+
+window.makeDraggable = function makeDraggable(boxId, headerId) {
+    const elmnt = document.getElementById(boxId);
+    const header = document.getElementById(headerId);
+    if (!elmnt || !header) return;
+
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    header.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        
+        // If it still has transform center, convert to absolute position.
+        // We use getComputedStyle because style.transform might be empty if set by CSS class.
+        const computedStyle = window.getComputedStyle(elmnt);
+        if (computedStyle.transform !== 'none') {
+            const rect = elmnt.getBoundingClientRect();
+            // First remove transform
+            elmnt.style.transform = 'none';
+            // Also unset right/bottom to prevent stretching
+            elmnt.style.right = 'auto';
+            elmnt.style.bottom = 'auto';
+            // Now set top and left strictly to the bounding rect
+            elmnt.style.top = rect.top + 'px';
+            elmnt.style.left = rect.left + 'px';
+        }
+
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.makeDraggable('login-wrapper', 'login-header');
+    window.makeDraggable('app-manager-box', 'app-manager-header');
+    window.makeDraggable('github-push-box', 'github-push-header');
+    window.makeDraggable('custom-dialog-box', 'custom-dialog-header');
+    window.makeDraggable('doc-viewer-box', 'doc-viewer-header');
+});

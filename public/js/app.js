@@ -1227,6 +1227,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.loadProjectState === 'function') {
         window.loadProjectState();
     }
+
+    if (typeof window.makeDraggable === 'function') {
+        window.makeDraggable('app-manager-box', 'app-manager-header');
+        window.makeDraggable('github-push-box', 'github-push-header');
+        window.makeDraggable('custom-dialog-box', 'custom-dialog-header');
+        window.makeDraggable('doc-viewer-box', 'doc-viewer-header');
+        window.makeDraggable('hitl-dialog-box', 'hitl-dialog-header');
+    }
 });
 
 // --- RESTORED MISSING FUNCTIONS ---

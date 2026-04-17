@@ -1,7 +1,7 @@
 let activePushPid = null;
 window.showGithubModal = async function showGithubModal(pid) {
             activePushPid = pid;
-            document.getElementById('github-push-modal').style.display = 'flex';
+            document.getElementById('github-push-modal').style.display = 'block';
             
             // Populate cached values
             document.getElementById('github-user').value = localStorage.getItem('gh_username') || '';

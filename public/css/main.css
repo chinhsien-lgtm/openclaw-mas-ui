@@ -207,3 +207,5 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
+
+#custom-dialog-header, #doc-viewer-header, #app-manager-header, #github-push-header, #login-header { cursor: move !important; }

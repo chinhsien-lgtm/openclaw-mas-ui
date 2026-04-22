@@ -190,6 +190,7 @@ async function main() {
     } catch(e) {}
 
     
+    
     let recentChatContext = '';
     try {
         const { data: logs } = await supabase.from('mas_chat_logs')
@@ -199,7 +200,17 @@ async function main() {
             .limit(20);
         
         if (logs && logs.length > 0) {
-            recentChatContext = "\n\n[RECENT CHAT HISTORY FOR CONTEXT]:\n" + logs.reverse().map(l => `[${l.type}] ${l.sender}${l.receiver ? ' -> ' + l.receiver : ''}: ${l.text}`).join('\n');
+            // Trim logs to stop at the most recent Emergency Stop or Clear Event
+            let validLogs = [];
+            for (let l of logs) {
+                if (l.text.includes('[Emergency Stop]') || l.text.includes('Records cleared')) {
+                    break;
+                }
+                validLogs.push(l);
+            }
+            if (validLogs.length > 0) {
+                recentChatContext = "\n\n[RECENT CHAT HISTORY FOR CONTEXT]:\n" + validLogs.reverse().map(l => `[${l.type}] ${l.sender}${l.receiver ? ' -> ' + l.receiver : ''}: ${l.text}`).join('\n');
+            }
         }
     } catch(e) {}
 

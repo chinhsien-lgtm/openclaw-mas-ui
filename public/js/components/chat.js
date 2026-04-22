@@ -34,13 +34,23 @@ window.appendLog = function appendLog(log) {
             
             div.className = className;
             
+            
+            let timeStr = '';
+            if (log.created_at) {
+                const d = new Date(log.created_at);
+                timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            } else if (log.timestamp) {
+                const d = new Date(log.timestamp);
+                timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            }
+
             let header = log.from;
             if (log.type === 'direct') header = `${log.from} ▶ ${log.to}`;
             if (log.type === 'thought') header = `<span class="thought-icon">💭</span>${log.from}'s Thought`;
             
             let text = log.text || '';
             text = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-            div.innerHTML = `<div class="sender-name">${header}</div>${text}`;
+            div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:baseline;"><div class="sender-name">${header}</div><div style="font-size:10px; color:rgba(0,0,0,0.5); font-family:sans-serif; margin-left:8px;">${timeStr}</div></div>${text}`;
             chatLog.appendChild(div);
             window.scrollToBottom();
         };

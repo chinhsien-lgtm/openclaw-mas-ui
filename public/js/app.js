@@ -155,7 +155,7 @@
         }
         
         // Auto-refresh file tree occasionally or hook into loadProjects
-        let bubbleTimeouts = {};
+        // bubbleTimeouts moved to map.js
 window.isInventoryExpanded = false;
         const socket = io();
         const chatLog = document.getElementById('chat-log');
@@ -735,12 +735,12 @@ window.isInventoryExpanded = false;
             const dataObj = window.MAS_STATE.officeRoster[agent];
             
             if (type === 'autonomous' || type === 'chatting') {
-                if (typeof showBubble === 'function') window.showBubble(agent, message);
+                if (typeof window.showBubble === 'function') window.showBubble(agent, message);
                 dataObj.dir = Math.random() > 0.5 ? 1 : 2;
                 setTimeout(() => dataObj.dir = 0, 2000);
             } else {
                 if (typeof window.MAS_ACTIONS !== 'undefined') window.MAS_ACTIONS.moveAgent(agent, actionTarget);
-                if(message && typeof showBubble === 'function') window.showBubble(agent, message);
+                if(message && typeof window.showBubble === 'function') window.showBubble(agent, message);
             }
         });
 

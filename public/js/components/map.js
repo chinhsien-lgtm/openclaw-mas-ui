@@ -1,3 +1,4 @@
+let bubbleTimeouts = {};
 window.showBubble = function showBubble(id, text) {
             const safeId = id.replace(/ /g, '-');
             const bubble = document.getElementById(`bubble-${safeId}`);

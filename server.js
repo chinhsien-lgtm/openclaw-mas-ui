@@ -198,7 +198,7 @@ async function addLog(logObj) {
 function emitAction(agent, type, message, actionTarget = null, project = '') {
     activeAgents[agent] = activeAgents[agent] || { id: agent, status: 'working' };
     activeAgents[agent].status = 'working';
-    const eventData = { agent, type, message, status: 'working', actionTarget, state: activeAgents[agent] };
+    const eventData = { agent, type, message, status: 'working', actionTarget, state: activeAgents[agent], project };
     io.emit('agent_event', eventData);
 }
 

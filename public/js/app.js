@@ -696,7 +696,7 @@ window.isInventoryExpanded = false;
                     window.renderInventory();
                 }
                 if (data.queue) {
-                    if (typeof renderQueue === 'function') {
+                    if (typeof window.renderQueue === 'function') {
                         window.MAS_STATE.queue = data.queue;
                         window.renderQueue();
                     }
@@ -707,15 +707,20 @@ window.isInventoryExpanded = false;
         
         socket.on('new_log', (logObj) => {
             if (!window.MAS_STATE) return;
+            
+            const currentProj = window.MAS_STATE.currentProjectName || 'main';
+            const logProj = logObj.project || 'main';
+            
+            if (currentProj !== logProj) return; // Ignore logs from other projects!
+
             window.MAS_STATE.allLogs.push(logObj);
-            // if(window.MAS_STATE.allLogs.length > 300) window.MAS_STATE.allLogs.shift();
             
             const isRelevant = (window.MAS_STATE.currentView === 'GLOBAL') || 
                                (window.MAS_STATE.currentView === logObj.from) || 
                                (window.MAS_STATE.currentView === logObj.to);
                                
             if (isRelevant) {
-                if (typeof appendLog === 'function') window.appendLog(logObj);
+                if (typeof window.appendLog === 'function') window.appendLog(logObj);
                 if (window.innerWidth <= 768 && !leftPanel.classList.contains('expanded') && logObj.from !== 'Boss') {
                     const badge = document.getElementById('chat-badge');
                     if (badge) badge.style.display = 'block';
@@ -747,15 +752,15 @@ window.isInventoryExpanded = false;
         socket.on('deliverable_ready', (file) => {
             if (!window.MAS_STATE) return;
             window.MAS_STATE.files.push(file);
-            if (typeof renderInventory === 'function') window.renderInventory();
+            if (typeof window.renderInventory === 'function') window.renderInventory();
         });
 
         socket.on('init_state', (data) => {
             if (!window.MAS_STATE) return;
             window.MAS_STATE.allLogs = data.logs || [];
             if(data.deliverables) { window.MAS_STATE.files = data.deliverables; }
-            if (typeof renderLogs === 'function') window.renderLogs();
-            if (typeof renderInventory === 'function') window.renderInventory(); 
+            if (typeof window.renderLogs === 'function') window.renderLogs();
+            if (typeof window.renderInventory === 'function') window.renderInventory(); 
         });
         
         socket.on('clear_history', (data) => {
@@ -774,7 +779,7 @@ window.isInventoryExpanded = false;
             const eventProject = data.project || 'main';
             if (currentProject !== eventProject && eventProject !== 'main') return;
             
-            if (typeof renderQueue === 'function') {
+            if (typeof window.renderQueue === 'function') {
                 window.MAS_STATE.queue = data;
                 window.renderQueue();
             }

@@ -587,7 +587,9 @@ app.post('/api/webhook/emit', (req, res) => {
     if (type === 'thought') {
         agentThought(agent, text, actionTarget, project);
     } else if (type === 'talk') {
-        agentTalk(agent, to || 'Boss', text, actionTarget, project);
+        const targetPerson = to || 'Boss';
+        const finalActionTarget = actionTarget || (targetPerson !== 'Boss' ? targetPerson : null);
+        agentTalk(agent, targetPerson, text, finalActionTarget, project);
     } else if (type === 'deliver') {
         if (deliverable) {
             deliverable.project = project; deliverables.push(deliverable);

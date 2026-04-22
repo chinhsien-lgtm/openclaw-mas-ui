@@ -69,6 +69,7 @@ window.MAS_ACTIONS = {
         else if (targetName === 'research') { tx = locs.research.x + (Math.random()*60 - 30); ty = locs.research.y + (Math.random()*60 - 30); }
         else if (targetName === 'home') { tx = roster[agentName].home.x; ty = roster[agentName].home.y; }
         else if (targetName === 'meeting') { tx = locs.meeting.x + (Math.random()*100 - 50); ty = locs.meeting.y + (Math.random()*60 - 30); }
+        else if (roster[targetName]) { tx = roster[targetName].current.x - 40; ty = roster[targetName].current.y; }
         
         roster[agentName].target.x = tx;
         roster[agentName].target.y = ty;
